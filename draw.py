@@ -494,16 +494,16 @@ def card(img, s, box, compact=False):
     text(d, (x1 - pad, y0 + pad - 1), s["region"], font(FONT_BOLD, 8),
          INK_FAINT, anchor="ra", spacing=1.2)
 
-    f_head = font(FONT_BOLD, 15)
-    hlines = wrap(s["head"], f_head, w - pad * 2 - 2)[:2]
+    f_head, hlines, hsz = fit_headline(s["head"], w - pad * 2 - 2)
+    lh = hsz + 3
     yy = y0 + pad + 30
     for ln in hlines:
         d.text((x0 + pad, yy), ln, font=f_head, fill=INK)
-        yy += 18
+        yy += lh
     if not compact:
         f_sum = font(FONT_REG, 10.5)
         slines = wrap(s["summary"], f_sum, w - pad * 2 - 2)[:2]
-        yy = max(yy + 1, y0 + pad + 30 + 2 * 18 + 1)
+        yy = max(yy + 1, y0 + pad + 30 + 2 * lh + 1)
         for ln in slines:
             d.text((x0 + pad, yy), ln, font=f_sum, fill=INK_DIM)
             yy += 13
