@@ -131,6 +131,21 @@ def wrap(s, f, maxw):
     return out
 
 
+def fit_headline(s, maxw, sizes=(15, 14, 13, 12.5)):
+    """Largest bold size wrapping to <=2 lines and leaving no one-word widow."""
+    for sz in sizes:
+        f = font(FONT_BOLD, sz)
+        lines = wrap(s, f, maxw)
+        if len(lines) == 1:
+            return f, lines, sz
+        if len(lines) == 2:
+            tail = lines[-1]
+            if len(tail.split()) >= 2 or f.getlength(tail) >= 0.40 * maxw:
+                return f, lines, sz
+    f = font(FONT_BOLD, sizes[-1])
+    return f, wrap(s, f, maxw)[:2], sizes[-1]
+
+
 def chip(draw, box, radius, fill, outline=None, width=1):
     draw.rounded_rectangle(box, radius=radius, fill=fill[:3],
                            outline=outline[:3] if outline else None, width=width)
@@ -462,10 +477,10 @@ def card(img, s, box, compact=False):
     d = ImageDraw.Draw(img, "RGBA")
     d.rounded_rectangle([x0, y0, x1, y1], radius=11, outline=mix(col, (10, 18, 34), 0.45), width=1)
 
-    # big faint number watermark
-    fwm = font(FONT_BOLD, 54)
-    d.text((x1 - 12, y0 + h / 2), str(s["n"]), font=fwm,
-           fill=mix(CARD_BASE, col, 0.30), anchor="rm")
+    # small corner numeral: texture only, never under the headline
+    fwm = font(FONT_BOLD, 34)
+    d.text((x1 - 10, y1 - 8), str(s["n"]), font=fwm,
+           fill=mix(CARD_BASE, col, 0.26) + (64,), anchor="rd")
 
     pad = 13
     # icon tile
